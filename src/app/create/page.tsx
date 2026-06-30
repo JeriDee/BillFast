@@ -645,7 +645,7 @@ export default function CreateInvoicePage() {
             {paid ? (
               <div className="space-y-4">
                 <button onClick={generatePDF}
-                  className="w-full bg-green-700 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-green-800 transition-colors">Download PDF Again</button>
+                  className="w-full bg-green-700 text-white py-2.5 md:py-3 px-4 md:px-6 rounded-lg font-semibold text-sm md:text-lg hover:bg-green-800 transition-colors">Download PDF Again</button>
                 {showThankYouMsg && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                     <h3 className="text-xl font-bold text-green-800 mb-2">Thank You!</h3>
@@ -655,7 +655,7 @@ export default function CreateInvoicePage() {
               </div>
             ) : (
               <button onClick={handlePayment} disabled={loading}
-                className="w-full bg-green-700 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                className="w-full bg-green-700 text-white py-2.5 md:py-3 px-4 md:px-6 rounded-lg font-semibold text-sm md:text-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 {loading ? "Processing..." : "Download Invoice — ₦300"}
               </button>
             )}

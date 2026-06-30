@@ -20,7 +20,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:gap-4">
             <Link
               href="/create"
-              className="bg-[#1a5c38] text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg font-medium text-sm md:text-base hover:bg-[#2d8653] transition-colors shadow-sm"
+              className="bg-[#1a5c38] text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg font-medium text-xs md:text-base hover:bg-[#2d8653] transition-colors shadow-sm"
             >
               Create Invoice
             </Link>

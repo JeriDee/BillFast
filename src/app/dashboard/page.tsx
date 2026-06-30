@@ -105,7 +105,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-green-900">Dashboard</h1>
           <Link
             href="/create"
-            className="bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-800 transition-colors"
+            className="bg-green-700 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-semibold text-sm md:text-base hover:bg-green-800 transition-colors"
           >
             New Invoice
           </Link>
@@ -251,7 +251,7 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full bg-green-700 text-white py-2 rounded-lg font-medium hover:bg-green-800 disabled:opacity-50 transition-colors"
+                className="w-full bg-green-700 text-white py-2 md:py-2.5 rounded-lg font-medium text-sm md:text-base hover:bg-green-800 disabled:opacity-50 transition-colors"
               >
                 {saving ? "Saving..." : saved ? "Saved ✓" : "Save Profile"}
               </button>
