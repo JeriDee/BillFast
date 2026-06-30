@@ -57,12 +57,12 @@ export default function HomePage() {
           style={{ backgroundImage: `url("data:image/svg+xml,${meshSvg}")` }}
         />
 
-        <div className="relative max-w-6xl mx-auto px-4 pt-16 pb-24 md:pt-24 md:pb-32">
+        <div className="relative max-w-6xl mx-auto px-4 pt-12 pb-20 md:pt-24 md:pb-32">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-6 backdrop-blur-sm border border-white/10">
               Nigerian invoicing, simplified
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-4 tracking-tight">
+            <h1 className="text-4xl md:text-7xl font-extrabold text-white leading-[1.1] mb-4 tracking-tight">
               Professional
               <br />
               Invoices in
@@ -75,13 +75,13 @@ export default function HomePage() {
                 />
               </span>
             </h1>
-            <p className="text-base md:text-lg text-white/60 max-w-xl mx-auto mt-6 mb-10 leading-relaxed">
+            <p className="text-sm md:text-lg text-white/60 max-w-xl mx-auto mt-6 mb-8 md:mb-10 leading-relaxed">
               Create clean, professional Nigerian invoices instantly. No signup
               required. Pay only ₦300 per invoice.
             </p>
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-[#F0A500] text-[#1a5c38] px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#FFB820] hover:-translate-y-0.5 transition-all shadow-lg shadow-[#F0A500]/30 hover:shadow-xl hover:shadow-[#F0A500]/40"
+              className="inline-flex items-center gap-2 bg-[#F0A500] text-[#1a5c38] px-8 py-3 md:px-10 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-[#FFB820] hover:-translate-y-0.5 transition-all shadow-lg shadow-[#F0A500]/30 hover:shadow-xl hover:shadow-[#F0A500]/40"
             >
               Create Your First Invoice
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -147,13 +147,13 @@ export default function HomePage() {
       </section>
 
       {/* ───── FEATURES ───── */}
-      <section className="pt-40 md:pt-48 pb-16 md:pb-24 bg-white">
+      <section className="pt-36 md:pt-48 pb-12 md:pb-24 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((f) => (
               <div
                 key={f.title}
-                className="group text-center p-8 rounded-2xl hover:bg-gray-50 transition-colors"
+                className="group text-center p-6 md:p-8 rounded-2xl hover:bg-gray-50 transition-colors"
               >
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a5c38] to-[#2d8653] flex items-center justify-center mx-auto mb-5 shadow-md group-hover:shadow-lg transition-shadow">
                   <f.icon className="text-white text-2xl" />
@@ -171,7 +171,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── DETAILS ───── */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-12 md:py-24 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
@@ -194,7 +194,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/create"
-                className="inline-flex items-center gap-2 mt-8 bg-[#1a5c38] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#2d8653] transition-colors shadow-md"
+                className="inline-flex items-center gap-2 mt-8 bg-[#1a5c38] text-white px-6 py-3 md:px-8 md:py-3 rounded-xl font-semibold text-sm md:text-base hover:bg-[#2d8653] transition-colors shadow-md"
               >
                 Create Invoice Now
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -202,7 +202,7 @@ export default function HomePage() {
                 </svg>
               </Link>
             </div>
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8">
               <div className="border-b-2 pb-4 mb-4" style={{ borderColor: "#1a5c38" }}>
                 <div className="flex justify-between items-start">
                   <div>
@@ -236,7 +236,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── CTA ───── */}
-      <section className="relative overflow-hidden py-20" style={{ background: "linear-gradient(135deg, #1a5c38 0%, #2d8653 100%)" }}>
+      <section className="relative overflow-hidden py-16 md:py-20" style={{ background: "linear-gradient(135deg, #1a5c38 0%, #2d8653 100%)" }}>
         <div
           className="absolute inset-0"
           style={{ backgroundImage: `url("data:image/svg+xml,${meshSvg}")` }}
@@ -250,9 +250,9 @@ export default function HomePage() {
           </p>
           <Link
             href="/create"
-            className="inline-flex items-center gap-2 bg-[#F0A500] text-[#1a5c38] px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#FFB820] hover:-translate-y-0.5 transition-all shadow-lg shadow-[#F0A500]/30 hover:shadow-xl hover:shadow-[#F0A500]/40"
-          >
-            Get Started Free
+              className="inline-flex items-center gap-2 bg-[#F0A500] text-[#1a5c38] px-8 py-3 md:px-10 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-[#FFB820] hover:-translate-y-0.5 transition-all shadow-lg shadow-[#F0A500]/30 hover:shadow-xl hover:shadow-[#F0A500]/40"
+            >
+              Get Started Free
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -261,7 +261,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── FOOTER ───── */}
-      <footer className="bg-[#0f2b1d] text-gray-500 py-10">
+      <footer className="bg-[#0f2b1d] text-gray-500 py-8 md:py-10">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-7 h-7 bg-gradient-to-br from-[#1a5c38] to-[#2d8653] rounded flex items-center justify-center">
