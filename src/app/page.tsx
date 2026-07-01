@@ -263,11 +263,16 @@ export default function HomePage() {
       {/* ───── FOOTER ───── */}
       <footer className="bg-[#0f2b1d] text-gray-500 py-8 md:py-10">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-7 h-7 bg-gradient-to-br from-[#1a5c38] to-[#2d8653] rounded flex items-center justify-center">
               <BiReceipt className="text-white text-xs" />
             </div>
             <span className="font-bold text-white">BillFast</span>
+          </div>
+          <div className="flex items-center justify-center gap-4 mb-3 text-xs">
+            <Link href="/terms" className="text-gray-500 hover:text-gray-300 transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="text-gray-500 hover:text-gray-300 transition-colors">Privacy Policy</Link>
+            <Link href="/refund" className="text-gray-500 hover:text-gray-300 transition-colors">Refund Policy</Link>
           </div>
           <p className="text-sm text-gray-500">
             Professional invoices in seconds. Made in Nigeria.
