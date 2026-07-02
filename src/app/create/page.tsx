@@ -90,6 +90,7 @@ export default function CreateInvoicePage() {
   const [loading, setLoading] = useState(false);
   const [paid, setPaid] = useState(false);
   const [showThankYouMsg, setShowThankYouMsg] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setInvoiceNumber(generateInvoiceNumber());
@@ -376,7 +377,23 @@ export default function CreateInvoicePage() {
     notes, paymentTerms, colors, footer,
   ]);
 
+  const validateForm = (): boolean => {
+    const errs: Record<string, string> = {};
+    if (!businessName.trim()) errs.businessName = "Business name is required";
+    if (!clientName.trim()) errs.clientName = "Client name is required";
+    if (!clientEmail.trim()) errs.clientEmail = "Client email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail)) errs.clientEmail = "Enter a valid email";
+    if (!dueDate.trim()) errs.dueDate = "Due date is required";
+    const hasValidItem = items.some(
+      (item) => item.description.trim() && item.unitPrice > 0 && item.quantity > 0,
+    );
+    if (!hasValidItem) errs.items = "Add at least one item with a description and price";
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handlePayment = useCallback(async () => {
+    if (!validateForm()) return;
     const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
     if (!publicKey) {
       alert("Payment not configured. Set NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY in .env.local");
@@ -385,21 +402,25 @@ export default function CreateInvoicePage() {
     setLoading(true);
     try {
       const ref = `BF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const onPaymentSuccess = async (transaction: { reference: string }) => {
+        setPaid(true);
+        setShowThankYouMsg(true);
+        if (session?.user) await saveInvoice(transaction.reference);
+        setLoading(false);
+        const pdf = generatePDF;
+        setTimeout(async () => { await pdf(); }, 500);
+      };
+      const onPaymentCancel = () => { setLoading(false); };
       const doCheckout = (popup: PaystackPopInstance) => {
-        popup.checkout({
+        popup.newTransaction({
           key: publicKey,
           email: businessEmail || clientEmail || "customer@billfast.ng",
           amount: 30000,
           currency: "NGN",
           reference: ref,
-          onSuccess: async (transaction) => {
-            setPaid(true);
-            setShowThankYouMsg(true);
-            if (session?.user) await saveInvoice(transaction.reference);
-            setLoading(false);
-            setTimeout(async () => { await generatePDF(); }, 500);
-          },
-          onCancel: () => { setLoading(false); },
+          onSuccess: onPaymentSuccess,
+          onCancel: onPaymentCancel,
+          onError: () => { setLoading(false); },
         });
       };
       const mod = await import("@paystack/inline-js");
@@ -410,7 +431,7 @@ export default function CreateInvoicePage() {
         await loadPaystackCDN();
         const ref = `BF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
         const popup = new window.PaystackPop();
-        popup.checkout({
+        popup.newTransaction({
           key: publicKey!,
           email: businessEmail || clientEmail || "customer@billfast.ng",
           amount: 30000,
@@ -421,16 +442,18 @@ export default function CreateInvoicePage() {
             setShowThankYouMsg(true);
             if (session?.user) await saveInvoice(transaction.reference);
             setLoading(false);
-            setTimeout(async () => { await generatePDF(); }, 500);
+            const pdf = generatePDF;
+            setTimeout(async () => { await pdf(); }, 500);
           },
           onCancel: () => { setLoading(false); },
+          onError: () => { setLoading(false); },
         });
       } catch {
         alert("Payment system failed to load. Please try again.");
         setLoading(false);
       }
     }
-  }, [businessEmail, clientEmail, session, saveInvoice, generatePDF]);
+  }, [businessEmail, clientEmail, dueDate, items, businessName, clientName, session, saveInvoice, generatePDF]);
 
   const updateFooter = (k: keyof InvoiceFooter, v: string | boolean) => {
     setFooter({ ...footer, [k]: v });
@@ -448,8 +471,9 @@ export default function CreateInvoicePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                <input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Your Business Name" />
+                <input type="text" value={businessName} onChange={(e) => { setBusinessName(e.target.value); setFieldErrors((prev) => ({ ...prev, businessName: "" })); }}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none ${fieldErrors.businessName ? "border-red-500" : "border-gray-300"}`} placeholder="Your Business Name" />
+                {fieldErrors.businessName && <p className="text-red-500 text-xs mt-1">{fieldErrors.businessName}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Business Email</label>
@@ -473,13 +497,15 @@ export default function CreateInvoicePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
-                <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Client Name" />
+                <input type="text" value={clientName} onChange={(e) => { setClientName(e.target.value); setFieldErrors((prev) => ({ ...prev, clientName: "" })); }}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none ${fieldErrors.clientName ? "border-red-500" : "border-gray-300"}`} placeholder="Client Name" />
+                {fieldErrors.clientName && <p className="text-red-500 text-xs mt-1">{fieldErrors.clientName}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Client Email</label>
-                <input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="client@example.com" />
+                <input type="email" value={clientEmail} onChange={(e) => { setClientEmail(e.target.value); setFieldErrors((prev) => ({ ...prev, clientEmail: "" })); }}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none ${fieldErrors.clientEmail ? "border-red-500" : "border-gray-300"}`} placeholder="client@example.com" />
+                {fieldErrors.clientEmail && <p className="text-red-500 text-xs mt-1">{fieldErrors.clientEmail}</p>}
               </div>
             </div>
 
@@ -498,8 +524,9 @@ export default function CreateInvoicePage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" />
+                <input type="date" value={dueDate} onChange={(e) => { setDueDate(e.target.value); setFieldErrors((prev) => ({ ...prev, dueDate: "" })); }}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none ${fieldErrors.dueDate ? "border-red-500" : "border-gray-300"}`} />
+                {fieldErrors.dueDate && <p className="text-red-500 text-xs mt-1">{fieldErrors.dueDate}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
@@ -537,6 +564,7 @@ export default function CreateInvoicePage() {
                 </div>
               ))}
               <button onClick={addItem} className="text-green-700 text-sm font-medium hover:text-green-800">+ Add Item</button>
+              {fieldErrors.items && <p className="text-red-500 text-xs mt-1">{fieldErrors.items}</p>}
             </div>
 
             {/* Taxes & Discounts */}
