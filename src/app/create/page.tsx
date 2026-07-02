@@ -13,26 +13,31 @@ import InvoicePreview from "@/components/InvoicePreview";
 
 declare global {
   interface Window {
-    PaystackPop: {
-      setup(config: {
-        key: string;
-        email: string;
-        amount: number;
-        currency: string;
-        ref?: string;
-        callback?: (response: { reference: string }) => void;
-        onClose?: () => void;
-      }): { openIframe(): void };
-    };
+    PaystackPop: new () => PaystackPopInstance;
+  }
+  interface PaystackPopInstance {
+    checkout(options: PaystackCheckoutOptions): Promise<void>;
+    newTransaction(options: PaystackCheckoutOptions): void;
+  }
+  interface PaystackCheckoutOptions {
+    key: string;
+    email: string;
+    amount: number;
+    currency: string;
+    reference?: string;
+    onSuccess?: (transaction: { reference: string }) => void;
+    onLoad?: (response: Record<string, unknown>) => void;
+    onCancel?: () => void;
+    onError?: (error: Error) => void;
   }
 }
 
-function loadPaystackScript(): Promise<void> {
+function loadPaystackCDN(): Promise<void> {
   return new Promise((resolve, reject) => {
-    if ((window as any).PaystackPop) { resolve(); return; }
+    if (typeof PaystackPop !== "undefined") { resolve(); return; }
     const urls = [
-      "https://js.paystack.co/v1/inline.js",
-      "https://js.paystack.com/v1/inline.js",
+      "https://js.paystack.co/v2/inline.js",
+      "https://js.paystack.com/v2/inline.js",
     ];
     let i = 0;
     let timedOut = false;
@@ -44,7 +49,7 @@ function loadPaystackScript(): Promise<void> {
       s.src = urls[i++];
       s.onload = () => {
         const poll = (n: number) => {
-          if ((window as any).PaystackPop) { clearTimeout(timer); resolve(); return; }
+          if (typeof PaystackPop !== "undefined") { clearTimeout(timer); resolve(); return; }
           if (n <= 0) { clearTimeout(timer); reject(new Error("Paystack not ready")); return; }
           setTimeout(() => poll(n - 1), 200);
         };
@@ -379,27 +384,51 @@ export default function CreateInvoicePage() {
     }
     setLoading(true);
     try {
-      await loadPaystackScript();
       const ref = `BF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-      const handler = window.PaystackPop.setup({
-        key: publicKey,
-        email: businessEmail || clientEmail || "customer@billfast.ng",
-        amount: 30000,
-        currency: "NGN",
-        ref,
-        callback: async (response: { reference: string }) => {
-          setPaid(true);
-          setShowThankYouMsg(true);
-          if (session?.user) await saveInvoice(response.reference);
-          setLoading(false);
-          setTimeout(async () => { await generatePDF(); }, 500);
-        },
-        onClose: () => { setLoading(false); },
-      });
-      handler.openIframe();
+      const doCheckout = (popup: PaystackPopInstance) => {
+        popup.checkout({
+          key: publicKey,
+          email: businessEmail || clientEmail || "customer@billfast.ng",
+          amount: 30000,
+          currency: "NGN",
+          reference: ref,
+          onSuccess: async (transaction) => {
+            setPaid(true);
+            setShowThankYouMsg(true);
+            if (session?.user) await saveInvoice(transaction.reference);
+            setLoading(false);
+            setTimeout(async () => { await generatePDF(); }, 500);
+          },
+          onCancel: () => { setLoading(false); },
+        });
+      };
+      const mod = await import("@paystack/inline-js");
+      const PaystackPopClass = mod.default || mod;
+      doCheckout(new PaystackPopClass());
     } catch {
-      alert("Payment system failed to load. Please try again.");
-      setLoading(false);
+      try {
+        await loadPaystackCDN();
+        const ref = `BF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        const popup = new window.PaystackPop();
+        popup.checkout({
+          key: publicKey!,
+          email: businessEmail || clientEmail || "customer@billfast.ng",
+          amount: 30000,
+          currency: "NGN",
+          reference: ref,
+          onSuccess: async (transaction) => {
+            setPaid(true);
+            setShowThankYouMsg(true);
+            if (session?.user) await saveInvoice(transaction.reference);
+            setLoading(false);
+            setTimeout(async () => { await generatePDF(); }, 500);
+          },
+          onCancel: () => { setLoading(false); },
+        });
+      } catch {
+        alert("Payment system failed to load. Please try again.");
+        setLoading(false);
+      }
     }
   }, [businessEmail, clientEmail, session, saveInvoice, generatePDF]);
 
