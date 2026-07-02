@@ -35,12 +35,22 @@ function loadPaystackScript(): Promise<void> {
       "https://js.paystack.com/v1/inline.js",
     ];
     let i = 0;
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; reject(new Error("Timed out")); }, 15000);
     const tryNext = () => {
-      if (i >= urls.length) { reject(new Error("Failed to load Paystack")); return; }
+      if (timedOut) return;
+      if (i >= urls.length) { clearTimeout(timer); reject(new Error("Failed to load Paystack")); return; }
       const s = document.createElement("script");
       s.src = urls[i++];
-      s.onload = () => resolve();
-      s.onerror = () => setTimeout(tryNext, 500);
+      s.onload = () => {
+        const poll = (n: number) => {
+          if ((window as any).PaystackPop) { clearTimeout(timer); resolve(); return; }
+          if (n <= 0) { clearTimeout(timer); reject(new Error("Paystack not ready")); return; }
+          setTimeout(() => poll(n - 1), 200);
+        };
+        poll(10);
+      };
+      s.onerror = () => { s.remove(); setTimeout(tryNext, 500); };
       document.head.appendChild(s);
     };
     tryNext();
